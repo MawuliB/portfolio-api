@@ -4,12 +4,17 @@ from schemas import UserSchema
 import random
 from mail import send_mail
 
+
 def get_user(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
 
 
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
+
+
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
 
 
 def create_user(db: Session, user: UserSchema):
@@ -19,9 +24,12 @@ def create_user(db: Session, user: UserSchema):
         username=user.username + str(int(random.random() * 10000)).zfill(4),
         socials=user.socials,
         data=user.data,
+        code=str(int(random.random() * 10000)).zfill(4),
     )
-    
-    send_mail(_user.email, _user.username)
+
+    send_mail(
+        _user.email, _user.username, _user.code, "Your Site is ready for viewing at"
+    )
     db.add(_user)
     db.commit()
     db.refresh(_user)
@@ -35,18 +43,22 @@ def remove_user(db: Session, email: str):
 
 
 def update_user(
-    db: Session, email: str, name: str, username: str, socials: dict, data: dict
+    db: Session, email: str, name: str, username: str, socials: dict, data: dict, code
 ):
     _user = get_user_by_email(db, email)
+    if _user.code == code:
+        _user.name, _user.email, _user.username, _user.socials, _user.data, _user.code = (
+            name,
+            email,
+            username,
+            socials,
+            data,
+            str(int(random.random() * 10000)).zfill(4),
+        )
 
-    _user.name, _user.email, _user.username, _user.socials, _user.data = (
-        name,
-        email,
-        username,
-        socials,
-        data,
-    )
-
-    db.commit()
-    db.refresh(_user)
-    return _user
+        db.commit()
+        send_mail(_user.email, _user.username, _user.code, "Your Site has been updated at")
+        db.refresh(_user)
+        return _user
+    else:
+        return "error"

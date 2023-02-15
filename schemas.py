@@ -11,6 +11,7 @@ class UserSchema(BaseModel):
     username: Optional[str] = None
     socials: Optional[Dict] = None
     data: Optional[Dict] = None
+    code: Optional[str] = None
 
     class config:
         orm_mode = True

@@ -11,3 +11,4 @@ class User(Base):
     username = Column(String)
     socials = Column(JSON)
     data = Column(JSON)
+    code = Column(String)
