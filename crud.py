@@ -5,6 +5,7 @@ import random
 from mail import send_mail
 import string
 import secrets
+import time
 
 
 def get_user(db: Session, skip: int = 0, limit: int = 100):
@@ -21,7 +22,8 @@ def get_user_by_username(db: Session, username: str):
 
 def create_user(db: Session, user: UserSchema):
     alphabet = string.ascii_letters + string.digits + string.punctuation
-    password = "".join(secrets.choice(alphabet) for i in range(16))
+    rng = secrets.SystemRandom(time.time())
+    password = "".join(rng.choice(alphabet) for i in range(16))
     _user = User(
         name=user.name,
         email=user.email,
@@ -50,7 +52,8 @@ def update_user(
     db: Session, email: str, name: str, username: str, socials: dict, data: dict, code
 ):
     alphabet = string.ascii_letters + string.digits + string.punctuation
-    password = "".join(secrets.choice(alphabet) for i in range(16))
+    rng = secrets.SystemRandom(time.time())
+    password = "".join(rng.choice(alphabet) for i in range(16))
     _user = get_user_by_email(db, email)
     if _user.code == code:
         (
