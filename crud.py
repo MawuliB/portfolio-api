@@ -6,9 +6,6 @@ from mail import send_mail
 import string
 import secrets
 
-alphabet = string.ascii_letters + string.digits + string.punctuation
-password = "".join(secrets.choice(alphabet) for i in range(16))
-
 
 def get_user(db: Session, skip: int = 0, limit: int = 100):
     return db.query(User).offset(skip).limit(limit).all()
@@ -23,6 +20,8 @@ def get_user_by_username(db: Session, username: str):
 
 
 def create_user(db: Session, user: UserSchema):
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    password = "".join(secrets.choice(alphabet) for i in range(16))
     _user = User(
         name=user.name,
         email=user.email,
@@ -50,6 +49,8 @@ def remove_user(db: Session, email: str):
 def update_user(
     db: Session, email: str, name: str, username: str, socials: dict, data: dict, code
 ):
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    password = "".join(secrets.choice(alphabet) for i in range(16))
     _user = get_user_by_email(db, email)
     if _user.code == code:
         (
