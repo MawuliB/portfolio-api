@@ -6,7 +6,7 @@ def send_mail(receiver, username, code, first):
     sender_email = "mawulibadassou5@gmail.com"
     receiver_email = receiver
     password = "zirrihcxonhkcktm"
-    link = "http://localhost:3000/" + username
+    link = "https://portfolio-production-aeb7.up.railway.app/" + username
 
     message = MIMEText(
         first
