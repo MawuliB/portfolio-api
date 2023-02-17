@@ -3,6 +3,11 @@ from model import User
 from schemas import UserSchema
 import random
 from mail import send_mail
+import string
+import secrets
+
+alphabet = string.ascii_letters + string.digits + string.punctuation
+password = "".join(secrets.choice(alphabet) for i in range(16))
 
 
 def get_user(db: Session, skip: int = 0, limit: int = 100):
@@ -24,7 +29,7 @@ def create_user(db: Session, user: UserSchema):
         username=user.username + str(int(random.random() * 10000)).zfill(4),
         socials=user.socials,
         data=user.data,
-        code=str(int(random.random() * 10000)).zfill(4),
+        code=password,
     )
 
     send_mail(
@@ -47,17 +52,26 @@ def update_user(
 ):
     _user = get_user_by_email(db, email)
     if _user.code == code:
-        _user.name, _user.email, _user.username, _user.socials, _user.data, _user.code = (
+        (
+            _user.name,
+            _user.email,
+            _user.username,
+            _user.socials,
+            _user.data,
+            _user.code,
+        ) = (
             name,
             email,
             username,
             socials,
             data,
-            str(int(random.random() * 10000)).zfill(4),
+            password,
         )
 
         db.commit()
-        send_mail(_user.email, _user.username, _user.code, "Your Site has been updated at")
+        send_mail(
+            _user.email, _user.username, _user.code, "Your Site has been updated at"
+        )
         db.refresh(_user)
         return _user
     else:
